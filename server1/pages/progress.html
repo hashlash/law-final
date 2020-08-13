@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Progress</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<table>
+    <tr>
+        <th>URL</th>
+        <th>Filename</th>
+        <th>Current Download</th>
+        <th>Progress Download</th>
+        <th>Total Download</th>
+        <th>Current Compression</th>
+        <th>Progress Compression</th>
+        <th>Total Compression</th>
+    </tr>
+    <tr id="url1">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url2">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url3">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url4">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url5">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url5">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url6">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url7">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url8">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url9">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+    <tr id="url10">
+        <td class="url"></td>
+        <td class="fname"></td>
+        <td class="download-current"></td>
+        <td class="download-progress"></td>
+        <td class="download-total"></td>
+        <td class="compression-current"></td>
+        <td class="compression-progress"></td>
+        <td class="compression-total"></td>
+    </tr>
+</table>
+<script>
+    if ("WebSocket" in window) {
+        const ws = new SockJS('{{.stompUrl}}');
+        const client = Stomp.over(ws);
+        const q = "/exchange/{{.exchangeName}}/{{.downloadRoutingKey}}";
+
+        const onConnect = function() {
+            console.log('connected');
+            client.subscribe(q, onMessage, {ack: 'client'});
+        };
+        const onError = function() {
+            console.log('error');
+        };
+        const onMessage = function(m) {
+            console.log('message received');
+            console.log(m);
+            const data = JSON.parse(m.body);
+            const row = document.getElementById(data['key']);
+            for (i = 0; i < row.children.length; i++) {
+                const elem = row.children[i];
+                if (elem.className === "url" && data['url'] !== undefined)
+                    elem.innerHTML = data['url'];
+                else if (elem.className === "fname" && data['fname'] !== undefined)
+                    elem.innerHTML = data['fname'];
+                else if (elem.className === "download-current" && data['current'] !== undefined)
+                    elem.innerHTML = data['current'];
+                else if (elem.className === "download-progress" && data['progress'] !== undefined)
+                    elem.innerHTML = data['progress'];
+                else if (elem.className === "download-total" && data['total'] !== undefined)
+                    elem.innerHTML = data['total'];
+            }
+            m.ack();
+        };
+
+        client.connect('guest', 'guest', onConnect, onError, 'law');
+    } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+    }
+</script>
+<script>
+    if ("WebSocket" in window) {
+        const ws = new SockJS('{{.stompUrl}}');
+        const client = Stomp.over(ws);
+        const q = "/exchange/{{.exchangeName}}/{{.compressRoutingKey}}";
+
+        const onConnect = function() {
+            console.log('connected');
+            client.subscribe(q, onMessage, {ack: 'client'});
+        };
+        const onError = function() {
+            console.log('error');
+        };
+        const onMessage = function(m) {
+            console.log('message received');
+            console.log(m);
+            const data = JSON.parse(m.body);
+            const row = document.getElementById(data['key']);
+            for (i = 0; i < row.children.length; i++) {
+                const elem = row.children[i];
+                if (elem.className === "compression-current" && data['current'] !== undefined)
+                    elem.innerHTML = data['current'];
+                else if (elem.className === "compression-progress" && data['progress'] !== undefined)
+                    elem.innerHTML = data['progress'];
+                else if (elem.className === "compression-total" && data['total'] !== undefined)
+                    elem.innerHTML = data['total'];
+            }
+            m.ack();
+        };
+
+        client.connect('guest', 'guest', onConnect, onError, 'law');
+    } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+    }
+</script>
+</body>
+</html>
